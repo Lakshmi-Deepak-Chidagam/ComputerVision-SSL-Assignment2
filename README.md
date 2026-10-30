@@ -68,7 +68,18 @@ The trained checkpoints are stored separately in Google Drive:
 - `improved_best.pth`
 - `mixup_best.pth`
 
-Add an accessible checkpoint link here.
+All trained model checkpoints are available here:
+
+[Download Trained Model Checkpoints]( https://drive.google.com/file/d/1HFMCxzKKi7koVulgyj3adaMWXSEkyOsJ/view?usp=sharing)
+
+Best measured test accuracy: 75.25%
+
+Best test-performing configuration:
+- Model: ResNet-18
+- Pretraining: SimCLR
+- Fine-tuning: Regularized supervised fine-tuning
+- Inference: Horizontal-flip Test-Time Augmentation
+- Checkpoint: improved_best.pth
 
 ## Conclusion
 
