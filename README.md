@@ -70,7 +70,7 @@ The trained checkpoints are stored separately in Google Drive:
 
 All trained model checkpoints are available here:
 
-[Download Trained Model Checkpoints]( https://drive.google.com/file/d/1HFMCxzKKi7koVulgyj3adaMWXSEkyOsJ/view?usp=sharing)
+[Download Trained Model Checkpoints](https://drive.google.com/drive/folders/1sJOkwIEhKA7CqWO6cSUNOR3pai4WZOhq?usp=drive_link)
 
 Best measured test accuracy: 75.25%
 
