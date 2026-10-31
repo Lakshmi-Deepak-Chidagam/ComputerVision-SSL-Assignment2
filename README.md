@@ -49,7 +49,7 @@ These are distinct outcomes. The highest test score does not determine the valid
 
 ## Trained checkpoints
 
-[Download trained model checkpoints](https://drive.google.com/drive/folders/1sJOkwIEhKA7CqWO6cSUNOR3pai4WZOhq?usp=drive_link)
+[Download trained model checkpoints](https://drive.google.com/drive/folders/1sJOkwIEhKA7CqWO6cSUNOR3pai4WZOhq?usp=sharing)
 
 Checkpoint files:
 
