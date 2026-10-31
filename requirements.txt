@@ -1,0 +1,9 @@
+# Original notebook did not pin versions. See README for limitations.
+torch>=2.2
+torchvision>=0.17
+numpy
+scikit-learn
+Pillow
+tqdm
+matplotlib
+pandas

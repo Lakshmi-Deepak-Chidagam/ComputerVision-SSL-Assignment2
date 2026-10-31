@@ -1,0 +1,26 @@
+{
+  "checkpoint": "checkpoints\\mixup_best.pth",
+  "split": "val",
+  "tta": false,
+  "correct": 264,
+  "total": 360,
+  "accuracy_percent": 73.33333333333333,
+  "classes": [
+    "Bedroom",
+    "Coast",
+    "Flower",
+    "Forest",
+    "Highway",
+    "Industrial",
+    "InsideCity",
+    "Kitchen",
+    "LivingRoom",
+    "Mountain",
+    "Office",
+    "OpenCountry",
+    "Store",
+    "Street",
+    "Suburb",
+    "TallBuilding"
+  ]
+}

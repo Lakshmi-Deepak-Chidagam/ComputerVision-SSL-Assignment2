@@ -1,0 +1,26 @@
+{
+  "checkpoint": "checkpoints\\improved_best.pth",
+  "split": "test",
+  "tta": true,
+  "correct": 301,
+  "total": 400,
+  "accuracy_percent": 75.25,
+  "classes": [
+    "Bedroom",
+    "Coast",
+    "Flower",
+    "Forest",
+    "Highway",
+    "Industrial",
+    "InsideCity",
+    "Kitchen",
+    "LivingRoom",
+    "Mountain",
+    "Office",
+    "OpenCountry",
+    "Store",
+    "Street",
+    "Suburb",
+    "TallBuilding"
+  ]
+}
