@@ -1,88 +1,218 @@
 # ComputerVision-SSL-Assignment2
-Self-Supervised Visual Representation Learning with SimCLR
-# Self-Supervised Visual Representation Learning
+
+Self-Supervised Visual Representation Learning with SimCLR.
 
 ## Overview
 
-This project investigates whether self-supervised contrastive learning improves image classification performance with limited labeled data.
+This project compares supervised ResNet18 training from scratch with SimCLR self-supervised pretraining followed by supervised fine-tuning, regularization, horizontal-flip test-time augmentation (TTA), and Mixup.
 
-We compare supervised ResNet-18 training against SimCLR self-supervised pretraining followed by supervised fine-tuning, additional regularization, Test-Time Augmentation (TTA), and Mixup.
+**No external pretrained weights or additional training images were used.**
 
 ## Dataset
 
-- 2,400 provided training images across 16 scene categories
-- 2,040 images used for training
-- 360 images reserved for stratified validation
-- 400 separate test images
-- Input resolution: 128 × 128 pixels
-
-The dataset is organized into class-specific directories.
-
-## Methods
-
-**1. Supervised baseline:** ResNet-18 trained from scratch using cross-entropy loss and AdamW.
-
-**2. SimCLR:** ResNet-18 trained from scratch using two independently augmented views per image and NT-Xent contrastive loss. The projection head maps 512-dimensional encoder features to 128-dimensional contrastive embeddings.
-
-**3. SSL fine-tuning:** The pretrained encoder is transferred to a 16-class classifier and fine-tuned using labeled images.
-
-**4. Regularized fine-tuning:** Additional fine-tuning using label smoothing, AdamW weight decay, and cosine learning-rate scheduling.
-
-**5. Test-Time Augmentation:** Average softmax probabilities from original and horizontally flipped images.
-
-**6. Mixup:** Further supervised fine-tuning using linearly mixed training images and their labels.
-
-No external pretrained weights were used.
+- 2,400 provided training images across 16 classes.
+- Stratified split: 2,040 training and 360 validation images, using random state 42.
+- 400 separate test images.
+- Input resolution: 128 × 128 pixels.
+- RGB normalization: mean 0.5 and standard deviation 0.5 per channel.
 
 ## Results
 
-| Method | Validation Accuracy | Test Accuracy |
+| Method | Validation accuracy | Test accuracy |
 |---|---:|---:|
-| Supervised ResNet-18 | 65.56% | 68.00% |
-| SimCLR + Fine-tuning | 70.00% | 70.50% |
-| Improved SSL | 71.94% | 75.00% |
-| Improved SSL + TTA | 72.22% | 75.25% |
-| Improved SSL + Mixup | 73.33% | 73.75% |
+| Supervised ResNet18 | 65.56% | 68.00% |
+| SimCLR + fine-tuning | 70.00% | 70.50% |
+| Improved regularized SSL | 71.94% | 75.00% |
+| Improved SSL + horizontal-flip TTA | 72.22% | **75.25%** |
+| Improved SSL + Mixup | **73.33%** | 73.75% |
 
-## Reproducibility
+**Highest observed test accuracy:** 75.25%, using `improved_best.pth` with horizontal-flip TTA.
 
-The `SSL_Assignment.ipynb` notebook contains the data preparation, training, evaluation, and experimental code.
+**Validation-selected configuration:** Mixup, using `mixup_best.pth`, with 73.33% validation and 73.75% test accuracy.
 
-To reproduce the experiments:
+These are distinct outcomes. The highest test score does not determine the validation-selected configuration. For the improved checkpoint, TTA was chosen over ordinary inference based on validation accuracy.
 
-1. Open the notebook in Google Colab and enable a GPU.
-2. Install the dependencies listed in the notebook.
-3. Place `train.zip` and `test.zip` inside `/content/datasets/`.
-4. Run the notebook cells in order.
-5. The training process generates model checkpoints and evaluates each experiment.
+## Repository contents
 
-Training uses a fixed random seed of 42 for the initial dataset split and random-number generators.
+| File | Purpose |
+|---|---|
+| `train.py` | Training sequence extracted from the original notebook |
+| `evaluate.py` | Saved-checkpoint evaluation, including optional TTA |
+| `models.py` | ResNet18 classifier, SimCLR model, and NT-Xent loss |
+| `hyperparameters.json` | Documented training settings |
+| `requirements.txt` | Required dependencies |
+| `requirements-tested.txt` | Direct dependency versions used for local verification |
+| `verify_submission.py` | Dataset and reported test-result verification |
+| `SSL_Assignment.ipynb` | Original experiment notebook |
 
-## Model Checkpoints
+`hyperparameters.json` documents the constants embedded in `train.py`; the script does not load this JSON as a configuration input.
 
-The trained checkpoints are stored separately in Google Drive:
+## Trained checkpoints
 
-- `baseline_best.pth`
-- `ssl_encoder.pth`
-- `ssl_best.pth`
-- `improved_best.pth`
-- `mixup_best.pth`
+[Download trained model checkpoints](https://drive.google.com/drive/folders/1sJOkwIEhKA7CqWO6cSUNOR3pai4WZOhq?usp=drive_link)
 
-All trained model checkpoints are available here:
+Checkpoint files:
 
-[Download Trained Model Checkpoints](https://drive.google.com/drive/folders/1sJOkwIEhKA7CqWO6cSUNOR3pai4WZOhq?usp=drive_link)
+- `baseline_best.pth`: supervised baseline.
+- `ssl_encoder.pth`: pretrained encoder only.
+- `ssl_best.pth`: initial SSL classifier.
+- `improved_best.pth`: improved classifier; use with TTA for the 75.25% result.
+- `mixup_best.pth`: validation-selected Mixup classifier.
 
-Best measured test accuracy: 75.25%
+Download `improved_best.pth` and `mixup_best.pth` into a local `checkpoints/` folder. TTA uses the same improved checkpoint; no separate TTA checkpoint is needed.
 
-Best test-performing configuration:
-- Model: ResNet-18
-- Pretraining: SimCLR
-- Fine-tuning: Regularized supervised fine-tuning
-- Inference: Horizontal-flip Test-Time Augmentation
-- Checkpoint: improved_best.pth
+The Google Drive folder must allow grader downloads without requesting access. Checkpoints are hosted externally rather than committed to GitHub.
+
+## Environment setup
+
+Local evaluation was verified using **Windows, Python 3.12.14, and CPU inference**.
+
+From the repository folder, install dependencies:
+
+```bash
+python -m pip install -r requirements-tested.txt
+```
+
+Alternatively, `requirements.txt` lists the general dependencies. GPU training requires a compatible PyTorch/CUDA installation.
+
+The tested dependency versions describe the local verification environment. The original Colab training environment was not version-pinned.
+
+## Dataset preparation
+
+Extract the provided archives so that these paths directly contain the class folders:
+
+```text
+data/
+  train/
+    train/
+      Bedroom/
+      Coast/
+      ... remaining class folders
+  test/
+    test/
+      Bedroom/
+      Coast/
+      ... remaining class folders
+checkpoints/
+  improved_best.pth
+  mixup_best.pth
+```
+
+Preserve the original class folder names and image filenames. Evaluation checks class ordering against the checkpoint metadata.
+
+In PowerShell, archives in Downloads can be extracted with:
+
+```powershell
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\train.zip" -DestinationPath ".\data\train"
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\test.zip" -DestinationPath ".\data\test"
+```
+
+## Evaluate saved models
+
+Run these commands from the repository folder using the Python environment where dependencies were installed. No retraining is required.
+
+### Improved SSL with TTA
+
+```bash
+python evaluate.py --checkpoint checkpoints/improved_best.pth --data-dir data/test/test --tta --device cpu --output-json evaluation_tta.json
+```
+
+Verified result: **301/400 correct = 75.25%**.
+
+TTA averages softmax probabilities from the original image and its horizontal flip before selecting the predicted class.
+
+### Improved SSL without TTA
+
+```bash
+python evaluate.py --checkpoint checkpoints/improved_best.pth --data-dir data/test/test --device cpu --output-json evaluation_improved.json
+```
+
+Verified result: **300/400 correct = 75.00%**.
+
+### Mixup without TTA
+
+```bash
+python evaluate.py --checkpoint checkpoints/mixup_best.pth --data-dir data/test/test --device cpu --output-json evaluation_mixup.json
+```
+
+Verified result: **295/400 correct = 73.75%**.
+
+## Verify validation results
+
+The evaluator reconstructs the original stratified validation split from all 2,400 training images.
+
+Improved SSL with TTA:
+
+```bash
+python evaluate.py --checkpoint checkpoints/improved_best.pth --data-dir data/train/train --split val --tta --device cpu --output-json validation_tta.json
+```
+
+Verified result: **260/360 correct = 72.22%**.
+
+Mixup:
+
+```bash
+python evaluate.py --checkpoint checkpoints/mixup_best.pth --data-dir data/train/train --split val --device cpu --output-json validation_mixup.json
+```
+
+Verified result: **264/360 correct = 73.33%**.
+
+## Combined test verification
+
+```bash
+python verify_submission.py --train-dir data/train/train --test-dir data/test/test --checkpoint-dir checkpoints --device cpu
+```
+
+This checks dataset counts and class ordering, loads both classifier checkpoints, evaluates all three test configurations, and compares the measured results with the reported correct-image counts. Results are saved under `verification_results/`.
+
+## Reproduce training
+
+A GPU is recommended. Use a fresh output folder to preserve the original submitted checkpoints:
+
+```bash
+python train.py --train-dir data/train/train --test-dir data/test/test --output-dir checkpoints_retrained
+```
+
+The training sequence is:
+
+| Stage | Settings |
+|---|---|
+| Supervised baseline | 15 epochs; cross-entropy; AdamW; learning rate 0.001; weight decay 0.0001 |
+| SimCLR pretraining | 30 epochs; batch size 64; NT-Xent temperature 0.5; AdamW; learning rate 0.001; weight decay 0.0001 |
+| SSL fine-tuning | 15 epochs; cross-entropy; AdamW; learning rate 0.0003; weight decay 0.0001 |
+| Improved fine-tuning | 20 epochs from `ssl_best.pth`; label smoothing 0.1; AdamW; learning rate 0.00005; weight decay 0.001; cosine scheduler with T_max 20 |
+| Mixup | 12 epochs per run from `improved_best.pth`; alpha 0.2; AdamW; learning rate 0.00003; weight decay 0.001 |
+
+SimCLR uses two independently augmented views of each training image. Its projection head maps 512-dimensional encoder features through a 512-dimensional hidden layer to 128-dimensional normalized embeddings. NT-Xent encourages agreement between views of the same image relative to other images.
+
+Supervised augmentation uses resizing, random horizontal flips, and random rotations up to 10 degrees. SSL augmentation uses random resized crops, horizontal flips, color jitter, and random grayscale. SSL pretraining uses only the 2,040 training-split images.
+
+Supervised checkpoints are retained according to validation accuracy. Improved and Mixup fine-tuning also consider the initial checkpoint as a candidate.
+
+**Notebook execution detail:** the original notebook contains two consecutive 12-epoch Mixup runs. Each starts from `improved_best.pth`; the second overwrites the first Mixup checkpoint. `train.py` preserves this sequence.
+
+Training saves environment details, split indices, checkpoints, and a measured run summary.
+
+## Original notebook workflow
+
+To use `SSL_Assignment.ipynb` in Google Colab:
+
+1. Enable a GPU.
+2. Install the notebook dependencies.
+3. Place `train.zip` and `test.zip` in `/content/datasets/`.
+4. Run the experiment cells in their documented order.
+5. Adapt the Google Drive save location to your account if needed.
+
+## Verification and limitations
+
+Saved-checkpoint evaluation was reproduced locally on Windows using Python 3.12.14 and CPU inference. All three test results and both validation results listed above matched the reported values.
+
+The original full training schedule was not rerun during this local verification. A reduced integration test exercised every training stage, checkpoint saving, and checkpoint reloading.
+
+The notebook seeds Python, NumPy, and PyTorch with 42 once. Later stages share the evolving random state. Repeated cells, library versions, hardware, and nondeterministic operations can change newly trained weights and results. Retraining reproduces the documented procedure but does not guarantee identical historical weights or accuracies.
+
+Use the original saved checkpoints to verify the reported evaluation. Multiple test evaluations and the small validation/test sets limit conclusions about small accuracy differences.
 
 ## Conclusion
 
-SimCLR self-supervised pretraining improved test accuracy compared with supervised-only training. Additional regularized fine-tuning achieved 75.00% test accuracy, while Test-Time Augmentation achieved 75.25%. Mixup improved validation accuracy but did not improve test accuracy over the previous model.
-
-The results demonstrate the potential of contrastive representation learning for limited-data classification while highlighting the importance of training configuration and evaluation methodology.
+SimCLR improved test accuracy over supervised training in the reported experiments. Regularized fine-tuning reached 75.00%, and horizontal-flip TTA increased this to 75.25%. Mixup achieved the highest validation accuracy but a lower test accuracy of 73.75%, illustrating that validation and test rankings can differ.
